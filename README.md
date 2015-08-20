@@ -1,6 +1,6 @@
 # [RealtorBuddy](https://github.com/JOSMANC/RealtorBuddy)
 ***
-![](https://github.com/JOSMANC/RealtorBuddy/blob/master/houses)
+![](https://github.com/JOSMANC/RealtorBuddy/blob/master/img/houses.png)
 
 ## Prototype Project for Data Science Fellowship
 

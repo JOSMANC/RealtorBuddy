@@ -1,8 +1,9 @@
-import pickle
+import cPickle as pickle
 import requests
+import time
 import pandas as pd
 import numpy as np
-import time
+from sqlalchemy import create_engine
 from sklearn import metrics
 from sklearn.ensemble import GradientBoostingRegressor, AdaBoostRegressor, RandomForestRegressor
 from sklearn.cross_validation import KFold
@@ -23,13 +24,24 @@ class RemoveRealtorTestModel(object):
         self.model = None        
         self.divided_position = None 
 
-    def get_data(self, dataset='select * from '):
+    def get_data(self, fquery, lookback, dataget=' select * from final_table;'):
         '''
         '''        
-        
+        f = open(fquery)
+        q = f.readlines()
+        q = ' '.join(q)
+        q = q.replace('\n',' ')
+        q = q.replace('xxxxx',str(lookback))
+        engine = create_engine('postgresql://user@localhost:5432/mydb')
+        q += dataget
+        df = pd.read_sql_query(dataget,con=engine)
+        hold_out_cutoff = pd.datetime(2014,10,1)
+        dftest = df[df.listdate < hold_out_cutoff].reset_index(drop=True)
+        dfhold = df[df.listdate > hold_out_cutoff].reset_index(drop=True)
+        dftest.reset_index(inplace=True, drop=True)
+        dfhold.reset_index(inplace=True, drop=True)
+        return dftest, dftest_y,  dfhold, dfhold_y
 
-    # def get_data(self, size=1., holdout=True):
-    #     sql_query
     def init_final(self, features, components, log, divided_position, model):
         '''
         '''        
@@ -267,33 +279,10 @@ class RemoveRealtorTestModel(object):
         return df
 
 if __name__ == "__main__":
-<<<<<<< HEAD
+    dftest, dftest_y,  dfhold, dfhold_y = get_data(fquery=, lookback=, dataget=' select * from final_table;'))
     features_to_try = []
     percent_train = 0.1
-=======
-    features_to_try = [
-         'taxes',
-         'livingarea',
-         'time_params'         
-         'approxlotsqft',
-        'comp_median_closeprice_blockgroup180',
-         'comp_meancloseprice_tract180',
-         'comp_mediancloseprice_tract180',
-         'comp_mediantaxes_tract180',
-         'comp_meantaxes_tract180',
-         'comp_median_taxes_blockgroup180',
-         'comp_median_livingarea_blockgroup180',
-         'comp_mean_taxes_blockgroup180',
-         'comp_min_closeprice_blockgroup180',
-         'comp_meanlivingarea_tract180',
-         'comp_mincloseprice_tract180',
-         'comp_mean_livingarea_blockgroup180',
-         'comp_meanyearbuilt_tract180',
-         'comp_mediandaytocontract_tract180',
-         'comp_medianlivingarea_tract180',
-         'comp_maxcloseprice_tract180']
-    percent_train = 0.02
->>>>>>> 447cfe941b8219b1ed0c1f89fd036d06f3b59293
+    features_to_try = []
     model_list = [rfr1 = RandomForestRegressor(n_estimators=100, n_jobs=-1)
                   rfr2 = RandomForestRegressor(n_estimators=1000, n_jobs=-1)
                   gbm1 = GradientBoostingRegressor(n_estimators= 5000, min_samples_split= 1,

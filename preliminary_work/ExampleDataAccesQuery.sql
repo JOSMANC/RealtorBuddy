@@ -143,7 +143,7 @@ with no_duplicate_homes as --- select only the last listing of each home
          and      market_homes2.listdate::date > (market_homes1.statuschangedate)::date-xxxxx --- change for look back 
          and      market_homes1.countytractblock_group = market_homes2.countytractblock_group 
          group by market_homes2.countytractblock_group, 
-                  market_homes1.listdate), tract_statistics as --- compute statistics for each block group 
+                  market_homes1.listdate), tract_statistics as   --- create new features from columns
 ( 
          select   market_homes2.countytract, 
                   stddev_pop(market_homes2.closeprice)    std_closeprice_tract, 
@@ -162,7 +162,7 @@ with no_duplicate_homes as --- select only the last listing of each home
          and      market_homes2.listdate::date > (market_homes1.listdate)::date-xxxxx --- change for look back 
          and      market_homes1.countytract = market_homes2.countytract 
          group by market_homes2.countytract, 
-                  market_homes1.listdate) final_table as --- create new features from columns 
+                  market_homes1.listdate) final_table as 
 ( 
           select    * 
           from      market_homes 
@@ -180,3 +180,4 @@ with no_duplicate_homes as --- select only the last listing of each home
           and       tract_statistics.listdate=market_homes.listdate
           where     no_duplicate_homes.contractdate::date-no_duplicate_homes.listdate::date>=0
           and       no_duplicate_homes.statuschangedate::date-no_duplicate_homes.listdate::date>=0)
+

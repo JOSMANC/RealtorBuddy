@@ -28,16 +28,13 @@ the model and a price is evaluated for input home.
         self.school_scores = None
         return None
 
-    def _clean_address(self, input):
-        '''
-        '''
-        clean_address = [add.strip().lower().replace(' ','+') for add in input]
-        return clean_address
-
     def compute_census_location(self, input):
         '''
+        access census location        
+        input: - string - home address        
+        ouput: - None
         '''
-        address = self._clean_address(input)
+        address = self.clean_address(input)
         census_query_middle_prefixs = ['street=','&city=','&state=','&zip=']
         census_query_prefix = 'http://geocoding.geo.census.gov/geocoder/geographies/address?'
         census_query_sufix = '&benchmark=Public_AR_Census2010&vintage=Census2010_Census2010&layers=14&format=json'
@@ -55,12 +52,15 @@ the model and a price is evaluated for input home.
 
     def compute_geolat_geolon(self, address):
         '''
+        access lat lon
+        input: - string - home address        
         '''
         self.geolat, self.geolon = pgeo.Geocoder.geocode(address).coordinates
         return None
 
     def break_fips(self, fips):
         '''
+        break census id code
         '''
         self.state = fips[0:2]
         self.county = fips[2:5]
@@ -68,15 +68,21 @@ the model and a price is evaluated for input home.
         self.block_group = fips[11:12]
         return None
 
-    def compute_census_area_features(self):
+    def compute_census_survey_features(self):
         '''
+        select census lookback features
+        output : - list - saved census survey information
         '''
-        df_cs = pd.read_pickle('census_statistics.pkl')
+        df_cs = pd.read_pickle('census_survey_features.pkl')
+        df_cs = pd.read_pickle('census_survey_features.pkl')
         census_info = df_cs[df_cs['countytractblock_group']==(self.county+self.tract+self.block_group)]
         return census_info
 
     def compute_school_features(self):
         '''
+        collect nearest school score and location
+        output : - float - school score
+                 - float - distance
         '''
         school_scorer_nn = pickle.load(file('school_scorer_nn.pkl', 'rb'))
         school_scores = school_scorer_nn.predict([self.geolat, self.geolon])
@@ -85,6 +91,8 @@ the model and a price is evaluated for input home.
 
     def compute_commerical_features(self):
         '''
+        access commerical densities
+        output : - float - census densities
         '''
         commerical_buisness_dict = pickle.load(file('commerical_buisness_dict.pkl', 'rb')) 
         commerical_buisness_nn = pickle.load(file('commerical_nn.pkl', 'rb'))
@@ -93,46 +101,47 @@ the model and a price is evaluated for input home.
 
     def compute_census_home_features(self):
         '''
+        query/select census lookback features
+        output :  - list - census area home features
         '''
         df_cc = pickle.load(file('census_comp_info.pkl', 'rb'))
         cenus_area_comps = df_cc[df_cc['countytractblock_group']==(self.county+self.tract+self.block_group)].values[0].tolist()[1:]
-        '''
-        alternative posgress query 
-
-        '''
         return cenus_area_comps
 
     def compute_timepoint(self):
         '''
+        collect time feature for random forest
+        output : - int - counter for time
         '''
         days_from_zero = (date.today()-date(2009,05,12)).days
         return days_from_zero
 
     def predict_price(self, features_vector, characteristics_vector):
         '''
+        unpickle and call model
+        input : - list - features and collected information about the home
+                - list - boolean features of the home
         '''
         rfr_for_predict = pickle.load(file('rfr_predict.pkl', 'rb'))
         pca_for_predict = pickle.load(file('pca_for_predict.pkl', 'rb'))
         pca_vector = pca_for_predict.transform(characteristics_vector)
-        predictor.predict(data)
-        data_components = data['']
+        price = predictor.predict(np.conctonate((features_vector,pca_vector),1))
+        return price
 
-
+    def clean_address(self, input):
+        '''
+        input: - string - home address
+        '''
+        clean_address = [add.strip().lower().replace(' ','+') for add in input]
+        return clean_address
 
 if __name__ == "__main__":
     rtr = RemoveTheRealtor()
     address = []
     manditory_feature_labels = []
     address = []
-    #manditory_feature_labels = ['livingarea', 'approxlotsqft', 'taxes']
-    manditory_feature = [1596, 6954, 702.00]
-    ''' general feature categories
-    'propertydescription', 'roofing', 'construction', 'unitstyle',
-    'exteriorfeatures', 'fencing', 'features', 'accessibilityfeat',
-    'communityfeatures', 'kitchenfeatures', 'spa', 'landscaping',
-    'basementdescription', 'poolprivate', 'masterbedroom',
-    'masterbathroom', 'otherrooms', 'laundry'    
-    '''
+    # test inputs
+    manditory_feature = [1596, 6954, 702.00] 
     characteristics_vector = \
           [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
            0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,

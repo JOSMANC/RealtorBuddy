@@ -1,6 +1,6 @@
 # [RealtorBuddy](https://github.com/JOSMANC/RealtorBuddy)
 ***
-
+![](https://github.com/JOSMANC/RealtorBuddy/blob/master/houses)
 
 ## Prototype Project for Data Science Fellowship
 
@@ -53,11 +53,9 @@ The optimal predictor of the price was consistently a random forest.  Scores wer
 
 #### Models results in optimal feature space
 
-Hold-out test set score containing the most recently priced homes.
+#### Hold-out test set
 
-On all market homes:
-
-One 95 percent of market homes:
+On 95 percent of market homes:
 
 | Model        |  Median Absolute Error  |Percent Error    |
 | ------------- |:---------------------:|:---------------:|
@@ -69,7 +67,8 @@ On inter-quartile range of market homes:
 | ---------------------|:--------------:|:----------------:|
 | Tuned Random Forest  |  13,000         |             9.1 |  
 
-Cross-Validation set containing over 200,000 homes:
+####Cross-Validation 
+
 On all market homes:
 
 | Model        |  Median Absolute Error  |Percent Error    |

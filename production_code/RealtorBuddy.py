@@ -136,7 +136,7 @@ the model and a price is evaluated for input home.
         return clean_address
 
 if __name__ == "__main__":
-    rtr = RemoveTheRealtor()
+    rtr = RealtorBuddy()
     address = []
     manditory_feature_labels = []
     address = []

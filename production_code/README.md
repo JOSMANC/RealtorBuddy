@@ -1,4 +1,4 @@
-# Not on code presented here
+# Note on code presented here
 
 Note due to restrictions on the dataset used in this project, a full fledge app could not be created to demonstrate the model's application nor could the final models be uploaded here.
 
